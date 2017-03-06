@@ -13,7 +13,7 @@ defmodule KVstoreTest do
     key = 'qwe001'
     value = "42"
     check_get("/crud/get/#{key}", 404, "no such key")
-    check_post("/crud/create", "key=#{key}&value=#{value}&ttl=1000", 200, "created")
+    check_post("/crud/create", "key=#{key}&value=#{value}&ttl=1000", 200, "done")
     check_get("/crud/get/#{key}", 200, value)
     check_post("/crud/create", "key=#{key}&value=#{value}&ttl=1000", 417, "key already exist")
   end
@@ -21,9 +21,9 @@ defmodule KVstoreTest do
   test "delete" do
     key = 'qwe002'
     value = "44"
-    check_post("/crud/create", "key=#{key}&value=#{value}&ttl=1000", 200, "created")
+    check_post("/crud/create", "key=#{key}&value=#{value}&ttl=1000", 200, "done")
     check_get("/crud/get/#{key}", 200, value)
-    check_post("/crud/delete/#{key}", "", 200, "deleted")
+    check_post("/crud/delete/#{key}", "", 200, "done")
     check_get("/crud/get/#{key}", 404, "no such key")
   end
 
@@ -31,9 +31,9 @@ defmodule KVstoreTest do
     key = 'qwe003'
     value = "46"
     value2 = "48"
-    check_post("/crud/create", "key=#{key}&value=#{value}&ttl=1000", 200, "created")
+    check_post("/crud/create", "key=#{key}&value=#{value}&ttl=1000", 200, "done")
     check_get("/crud/get/#{key}", 200, value)
-    check_post("/crud/update/#{key}", "value=#{value2}", 200, "updated")
+    check_post("/crud/update/#{key}", "value=#{value2}", 200, "done")
     check_get("/crud/get/#{key}", 200, value2)
     check_post("/crud/update/no_key", "value=#{value2}", 404, "no such key")
   end
@@ -42,7 +42,7 @@ defmodule KVstoreTest do
     key = 'qwe004'
     value = "50"
     ttl = 1
-    check_post("/crud/create", "key=#{key}&value=#{value}&ttl=#{ttl}", 200, "created")
+    check_post("/crud/create", "key=#{key}&value=#{value}&ttl=#{ttl}", 200, "done")
     check_get("/crud/get/#{key}", 200, value)
     Process.sleep(1000*ttl + 100)
     check_get("/crud/get/#{key}", 404, "no such key")
@@ -55,7 +55,7 @@ defmodule KVstoreTest do
     check_post("/crud/create", "key=#{key}&value=#{value}&ttl=45.4", 400, "ttl is not integer")
     check_post("/crud/create", "key=#{key}&value=#{value}&ttl=-250", 400, "ttl is not positive")
     check_post("/crud/create", "key=#{key}&value=#{value}&ttl=0",    400, "ttl is not positive")
-    check_post("/crud/create", "key=#{key}&value=#{value}&ttl=2000", 200, "created")
+    check_post("/crud/create", "key=#{key}&value=#{value}&ttl=2000", 200, "done")
     check_get("/crud/get/#{key}", 200, value)
   end
 
