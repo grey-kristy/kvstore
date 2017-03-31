@@ -1,10 +1,12 @@
 defmodule KVstore do
   require Logger
   use Application
+  use Supervisor
 
   def start(_type, _) do
     children = [
-      Plug.Adapters.Cowboy.child_spec(:http, KVstore.Router, [], port: get_port())
+      Plug.Adapters.Cowboy.child_spec(:http, KVstore.Router, [], port: get_port()),
+      worker(KVstore.Cleaner, [])
     ]
     opts = [strategy: :one_for_one, name: KVstore.Supervisor]
     Logger.info "start http server on port #{get_port()}"

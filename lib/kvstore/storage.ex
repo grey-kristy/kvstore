@@ -5,7 +5,6 @@ defmodule KVstore.Storage do
 
   def init() do
     {:ok, _table} = :dets.open_file(table_name(), [type: :set, auto_save: 10000])
-    refresh_ttl()
   end
 
   def clear() do
@@ -22,10 +21,7 @@ defmodule KVstore.Storage do
       ttl when ttl < now ->
         delete(key)
       ttl ->
-        spawn(fn ->
-          Process.sleep(1000*(ttl-now))
-          delete(key)
-        end)        
+        KVstore.Cleaner.schedule_cleanup(key, (ttl-now))
     end
     :continue
   end
@@ -44,11 +40,7 @@ defmodule KVstore.Storage do
     Logger.debug "trying to create key #{key}, value #{value}"
     case :dets.insert_new(table_name(), {key, value, now()+ttl}) do
       true  ->
-        spawn(fn ->
-          Process.sleep(1000*ttl)
-          delete(key)
-        end)
-        :ok
+        KVstore.Cleaner.schedule_cleanup(key, ttl)
       false ->
         {:error, {:key_exist, "key already exist"}}
     end
